@@ -3,13 +3,14 @@ const ease = [0.22, 1, 0.36, 1] as const
 export default function Reveal() {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 pb-16 text-center">
+      <motion.div className="absolute left-1/2 top-1/2 h-[60%] w-[92%] -translate-x-1/2 -translate-y-1/2" style={{ background: 'radial-gradient(closest-side, rgba(255,107,0,.22), rgba(194,24,91,.08) 60%, transparent)' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, duration: 3 }} />
       <motion.span className="mb-4 text-xl" initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0.6, 1] }} transition={{ delay: 2.2, duration: 3, repeat: Infinity, repeatDelay: 1 }}>✨</motion.span>
       <h1 className="font-display flex flex-col items-center font-black leading-[0.95] sm:flex-row sm:gap-[0.3em]" style={{ fontSize: 'clamp(3.2rem, 13vw, 10.5rem)' }}>
         {['HAPPY', 'DIWALI'].map((w, i) => (
-          <motion.span key={w} initial={{ opacity: 0, y: 40, scale: 0.85, filter: 'blur(24px)', letterSpacing: '0.35em' }}
+          <motion.span key={w} initial={{ opacity: 0, y: 40, scale: 0.85, filter: 'blur(10px)', letterSpacing: '0.35em' }}
             animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', letterSpacing: '0.04em' }}
             transition={{ delay: 2.6 + i * 0.35, duration: 2, ease }}>
-            <span className="shimmer" style={{ filter: 'drop-shadow(0 0 18px rgba(255,107,0,.55)) drop-shadow(0 0 46px rgba(194,24,91,.35))' }}>{w}</span>
+            <span className="shimmer">{w}</span>
           </motion.span>
         ))}
       </h1>

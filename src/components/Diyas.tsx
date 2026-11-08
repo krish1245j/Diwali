@@ -9,10 +9,7 @@ export function Diya({ i = 0, onSpark }: { i?: number; onSpark?: (x: number, y: 
         style={{ background: 'radial-gradient(circle, rgba(255,200,80,.7), rgba(227,66,32,.3) 40%, transparent 70%)' }}
         initial={{ scale: 0.2, opacity: 1 }} animate={{ scale: 3, opacity: 0 }} transition={{ duration: 1.2, ease: 'easeOut' }} />}
       <motion.div key={'f' + n} className="absolute left-1/2 top-[-18px] -translate-x-1/2" initial={{ scale: n ? 2 : 1 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 120, damping: 8 }}>
-        <motion.div className="h-8 w-4 origin-bottom rounded-[50%_50%_50%_50%/70%_70%_30%_30%]"
-          style={{ background: 'radial-gradient(ellipse at 50% 75%, #fff 0%, #FFD700 35%, #FF6B00 70%, transparent)', boxShadow: '0 0 30px 12px rgba(255,120,30,.55)' }}
-          animate={{ scaleY: [1, 1.18, 0.92, 1.1, 1], scaleX: [1, 0.9, 1.06, 0.95, 1], rotate: [0, 3, -3, 2, 0] }}
-          transition={{ duration: 1.6 + (i % 5) * 0.13, repeat: Infinity, ease: 'easeInOut' }} />
+        <div className="flame h-8 w-4 rounded-[50%_50%_50%_50%/70%_70%_30%_30%]" style={{ animationDuration: 1.6 + (i % 5) * 0.13 + 's', background: 'radial-gradient(ellipse at 50% 75%, #fff 0%, #FFD700 35%, #FF6B00 70%, transparent)', boxShadow: '0 0 22px 8px rgba(255,120,30,.5)' }} />
       </motion.div>
       <svg viewBox="0 0 80 32" className="w-[12vw] max-w-[80px]">
         <path d="M2 8 Q40 2 78 8 Q70 30 40 31 Q10 30 2 8Z" fill="#c77a1e" />

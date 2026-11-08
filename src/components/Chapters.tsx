@@ -7,7 +7,8 @@ import { Diya } from './Diyas'
 
 const ease = [0.22, 1, 0.36, 1] as const
 type Par = { y1: MotionValue<number>; y2: MotionValue<number> }
-const glow = { filter: 'drop-shadow(0 0 18px rgba(255,107,0,.5)) drop-shadow(0 0 40px rgba(194,24,91,.3))' }
+const glow = {}
+const M = 'linear-gradient(transparent, #000 30%, #000 70%, transparent)'
 
 function Chapter(p: { id: string; eyebrow: string; title: string; text: string; decor?: (a: Par) => ReactNode; after?: ReactNode; big?: boolean; onEnter?: () => void }) {
   const ref = useRef<HTMLElement>(null)
@@ -16,9 +17,10 @@ function Chapter(p: { id: string; eyebrow: string; title: string; text: string; 
   const inView = useInView(ref, { amount: 0.5 })
   useEffect(() => { if (inView) p.onEnter?.() }, [inView])
   return (
-    <section id={p.id} ref={ref} className="relative z-20 flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
+    <section id={p.id} ref={ref} className={`${p.id === 'ch1' ? '' : '-mt-[8svh] '}relative z-20 flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center`}>
       {p.decor?.({ y1, y2 })}
       <motion.div className="relative z-10 flex max-w-3xl flex-col items-center" initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ amount: 0.3 }} transition={{ duration: 1.4, ease }}>
+        <div className="pointer-events-none absolute -inset-x-10 -inset-y-6 -z-10" style={{ background: 'radial-gradient(closest-side, rgba(255,107,0,.18), transparent)' }} />
         <p className="font-display mb-5 text-[10px] tracking-[0.5em] text-orange-300/80 sm:text-xs">{p.eyebrow}</p>
         <h2 className="font-display font-black leading-tight" style={{ fontSize: p.big ? 'clamp(2.3rem,8.5vw,6rem)' : 'clamp(2rem,7vw,4.8rem)' }}><span className="shimmer" style={glow}>{p.title}</span></h2>
         <div className="my-6 h-px w-32 bg-gradient-to-r from-transparent via-orange-400 to-transparent" />
@@ -28,8 +30,8 @@ function Chapter(p: { id: string; eyebrow: string; title: string; text: string; 
     </section>
   )
 }
-const wash = (bg: string) => <div className="pointer-events-none absolute inset-0" style={{ background: bg }} />
-const orb = (y: MotionValue<number>, cls: string, c: string) => <motion.div style={{ y, background: c }} className={`pointer-events-none absolute rounded-full blur-3xl ${cls}`} />
+const wash = (bg: string) => <div className="pointer-events-none absolute inset-0" style={{ background: bg, maskImage: M, WebkitMaskImage: M }} />
+const orb = (y: MotionValue<number>, cls: string, c: string) => <motion.div style={{ y, background: `radial-gradient(closest-side, ${c}, transparent)` }} className={`pointer-events-none absolute rounded-full ${cls}`} />
 
 export default function Chapters({ spark, celebrate, toTop }: { spark: (x: number, y: number) => void; celebrate: () => void; toTop: () => void }) {
   return (
@@ -46,7 +48,7 @@ export default function Chapters({ spark, celebrate, toTop }: { spark: (x: numbe
         decor={({ y1, y2 }) => <>
           {wash('radial-gradient(circle at 85% 15%, rgba(255,153,51,.3), transparent 50%), radial-gradient(circle at 10% 85%, rgba(139,0,0,.55), transparent 55%)')}
           <motion.div style={{ y: y2 }} className="absolute inset-0 flex items-center justify-center opacity-60">
-            <Rangoli variant="gold" delay={0} className="h-[min(150vw,115vh)] w-[min(150vw,115vh)]" /></motion.div>
+            <Rangoli variant="gold" delay={0} className="h-[min(120vw,80svh)] w-[min(120vw,80svh)]" /></motion.div>
           {orb(y1, 'right-[-4rem] top-1/3 h-64 w-64', 'rgba(255,153,51,.2)')}<Toran /></>} />
 
       <Chapter id="ch3" eyebrow="HAPPINESS & TOGETHERNESS" title="Celebrate the Moments That Matter"
@@ -60,7 +62,7 @@ export default function Chapters({ spark, celebrate, toTop }: { spark: (x: numbe
         text="Spread light. Share happiness. Create memories." onEnter={celebrate}
         decor={() => <>
           {wash('radial-gradient(ellipse at 50% 40%, rgba(139,0,0,.55), transparent 65%), radial-gradient(ellipse at 50% 100%, rgba(194,24,91,.25), transparent 60%)')}
-          <Rangoli className="absolute left-1/2 top-1/2 h-[min(140vw,110vh)] w-[min(140vw,110vh)] -translate-x-1/2 -translate-y-1/2 opacity-40" delay={0} /><Toran /></>}
+          <Rangoli className="absolute left-1/2 top-1/2 h-[min(120vw,80svh)] w-[min(120vw,80svh)] -translate-x-1/2 -translate-y-1/2 opacity-40" delay={0} /><Toran /></>}
         after={<>
           <button onClick={celebrate} className="font-display mt-10 rounded-full border border-orange-400/60 bg-black/30 px-7 py-4 text-[11px] tracking-[0.4em] text-amber-100 backdrop-blur transition hover:bg-orange-500/10 hover:shadow-[0_0_36px_rgba(255,107,0,.45)]">CELEBRATE WITH FIREWORKS</button>
           <button onClick={toTop} className="mt-6 p-3 text-xs tracking-[0.3em] text-amber-200/50 hover:text-amber-200">BACK TO TOP ↑</button>

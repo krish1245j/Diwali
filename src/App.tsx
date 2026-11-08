@@ -42,18 +42,20 @@ export default function App() {
       for (let i = 0; i < 5; i++) { const e = document.getElementById(i ? 'ch' + i : 'ch0'); if (e && e.getBoundingClientRect().top < innerHeight * 0.5) c = i }
       chRef.current = c; setCh(c); setShowTop(scrollY > innerHeight * 0.8)
     }
-    addEventListener('scroll', f, { passive: true })
-    return () => { clearTimeout(t); removeEventListener('scroll', f) }
+    let q = 0
+    const onS = () => { if (!q) q = requestAnimationFrame(() => { q = 0; f() }) }
+    addEventListener('scroll', onS, { passive: true })
+    return () => { clearTimeout(t); cancelAnimationFrame(q); removeEventListener('scroll', onS) }
   }, [lit])
 
   return (
     <main key={run} className="relative w-screen overflow-x-clip bg-black">
-      <motion.div className="fixed inset-0 z-0" initial={false} animate={{ backgroundColor: lit ? BG[ch] : '#000000' }} transition={{ duration: 1.8, ease: 'easeInOut' }} />
+      <div className="fixed inset-0 z-0" style={{ backgroundColor: lit ? BG[ch] : '#000', transition: 'background-color 1.8s ease-in-out' }} />
       <FireCanvas ref={fire} lit={lit} onBoom={snd.boom} chapterRef={chRef} />
 
       <section id="ch0" className="relative h-[100dvh] overflow-hidden">
         {lit && <Light />}
-        {lit && <Rangoli className="absolute left-1/2 top-1/2 z-[5] h-[min(150vw,130vh)] w-[min(150vw,130vh)] -translate-x-1/2 -translate-y-1/2" />}
+        {lit && <Rangoli className="absolute left-1/2 top-1/2 z-[5] h-[min(120vw,88dvh)] w-[min(120vw,88dvh)] -translate-x-1/2 -translate-y-1/2" />}
         {lit && <Lanterns />}
         <Bulb lit={lit} onClick={ignite} />
         {lit && <Reveal />}

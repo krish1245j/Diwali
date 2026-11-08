@@ -22,17 +22,17 @@ const FireCanvas = forwardRef<FireHandle, Props>(({ lit, onBoom, chapterRef }, f
 
   useEffect(() => {
     const cv = ref.current!, ctx = cv.getContext('2d')!
-    let w = 0, h = 0, raf = 0, fade = 0
+    let w = 0, h = 0, raf = 0, fade = 0, last = 0
     const mobile = innerWidth < 640
     const parts: P[] = [], rockets: R[] = []
     const mk = (k: 0 | 1 | 2 | 3, n: number): A[] => Array.from({ length: n }, () => ({ x: Math.random(), y: Math.random(), z: rand(0.4, 1.3), v: rand(0.02, 0.08), p: rand(0, 6.28), k, c: k === 3 ? pick(PETAL) : pick(['#FF6B00', '#E34220', '#FF9933', '#d7263d']) }))
-    const amb = [...mk(0, mobile ? 35 : 80), ...mk(1, mobile ? 12 : 30), ...mk(2, mobile ? 22 : 50), ...mk(3, mobile ? 9 : 20)]
-    const resize = () => { const d = Math.min(devicePixelRatio || 1, 2); w = innerWidth; h = innerHeight; cv.width = w * d; cv.height = h * d; ctx.setTransform(d, 0, 0, d, 0, 0) }
+    const amb = [...mk(0, mobile ? 18 : 60), ...mk(1, mobile ? 8 : 24), ...mk(2, mobile ? 12 : 36), ...mk(3, mobile ? 5 : 14)]
+    const resize = () => { const d = mobile ? 1 : Math.min(devicePixelRatio || 1, 1.5); w = innerWidth; h = innerHeight; cv.width = w * d; cv.height = h * d; ctx.setTransform(d, 0, 0, d, 0, 0) }
     resize(); addEventListener('resize', resize)
     const explode = (x: number, y: number, n = 90, kind?: string) => {
       const pal = Math.random() < 0.2 ? PAL[4] : PAL[chapterRef.current] || PAL[0]
       const k = kind ?? pick(['sphere', 'sphere', 'ring', 'willow', 'double']), c1 = pick(pal), c2 = pick(pal)
-      n = mobile ? Math.round(n * 0.65) : n
+      n = mobile ? Math.round(n * 0.5) : n; if (parts.length > (mobile ? 350 : 900)) return
       for (let i = 0; i < n; i++) {
         const a = (i / n) * 6.283 + rand(-0.05, 0.05); let s = rand(0.8, 4.6), c = i % 3 ? c1 : c2, decay = rand(0.008, 0.016), g = 0.035
         if (k === 'ring') s = 3.6
@@ -46,6 +46,9 @@ const FireCanvas = forwardRef<FireHandle, Props>(({ lit, onBoom, chapterRef }, f
     api.current = { explode, launch, celebrate }
 
     const frame = (t: number) => {
+      raf = requestAnimationFrame(frame)
+      if (document.hidden || t - last < (mobile ? 33 : 16)) return
+      last = t
       ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fillRect(0, 0, w, h)
       ctx.globalCompositeOperation = 'lighter'
       fade += ((litRef.current ? 1 : 0) - fade) * 0.02
@@ -59,14 +62,14 @@ const FireCanvas = forwardRef<FireHandle, Props>(({ lit, onBoom, chapterRef }, f
         ctx.globalAlpha = al
         if (d.k === 3) { ctx.save(); ctx.translate(px, py); ctx.rotate(t / 900 + d.p); ctx.fillStyle = d.c; ctx.beginPath(); ctx.ellipse(0, 0, 3 + 3 * d.z, 1.5 + 1.5 * d.z, 0, 0, 6.283); ctx.fill(); ctx.restore(); continue }
         ctx.fillStyle = d.k === 1 ? '#fff5cc' : d.k === 2 ? d.c : '#FFB000'
-        ctx.shadowColor = d.k === 2 ? d.c : '#FFB000'; ctx.shadowBlur = d.k === 2 ? 10 : 6
+        
         ctx.beginPath(); ctx.arc(px, py, (d.k === 1 ? 0.8 : d.k === 2 ? 1.3 : 1) * d.z * 1.4, 0, 6.283); ctx.fill()
       }
       ctx.shadowBlur = 0
       for (let i = rockets.length - 1; i >= 0; i--) {
         const r = rockets[i]; r.y += r.vy; r.vy *= 0.985
         ctx.globalAlpha = 1; ctx.fillStyle = '#fff1c4'; ctx.beginPath(); ctx.arc(r.x, r.y, 1.8, 0, 6.283); ctx.fill()
-        parts.push({ x: r.x, y: r.y, vx: rand(-0.2, 0.2), vy: rand(0.2, 0.8), life: 0.55, decay: 0.03, c: r.c, r: 1.2, g: 0.03, fl: false })
+        if (!mobile || Math.random() < 0.5) parts.push({ x: r.x, y: r.y, vx: rand(-0.2, 0.2), vy: rand(0.2, 0.8), life: 0.55, decay: 0.03, c: r.c, r: 1.2, g: 0.03, fl: false })
         if (r.y <= r.ty || r.vy > -1.5) { explode(r.x, r.y); boomRef.current(); rockets.splice(i, 1) }
       }
       for (let i = parts.length - 1; i >= 0; i--) {
@@ -75,7 +78,7 @@ const FireCanvas = forwardRef<FireHandle, Props>(({ lit, onBoom, chapterRef }, f
         ctx.globalAlpha = p.fl ? p.life * Math.random() : p.life; ctx.fillStyle = p.c
         ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (0.5 + p.life), 0, 6.283); ctx.fill()
       }
-      ctx.globalAlpha = 1; raf = requestAnimationFrame(frame)
+      ctx.globalAlpha = 1
     }
     raf = requestAnimationFrame(frame)
     return () => { cancelAnimationFrame(raf); removeEventListener('resize', resize) }
